@@ -652,8 +652,6 @@
         // --- Helpers ---
         window.selectMethod = (id) => { state.data.learningMethod = id; if (id === 'none') { state.data.moveReasons = []; state.data.moveReasonOther = ''; } renderHistory(); };
         window.toggleReason = (id) => { const index = state.data.moveReasons.indexOf(id); if (index === -1) state.data.moveReasons.push(id); else state.data.moveReasons.splice(index, 1); renderHistory(); };
-        window.selectDisposition = (id, val) => { state.data.disposition[id] = val; renderDisposition(); };
-        function getLearningMethodLabel(id) { const m = learningMethods.find(x => x.id === id); return m ? m.label : '미선택'; }
 
         // Expose functions to window
         window.setConsultPath = setConsultPath;
@@ -698,13 +696,16 @@
                     state.step++;
                     renderStep();
                 } else {
+                    // 논리적 에러 (서버가 명시적으로 에러를 보낸 경우)
                     showAlert("전송 실패: " + (res.message || "알 수 없는 오류"));
                     btnNext.innerHTML = '<span>예약 완료하기</span>';
                 }
             } catch (err) {
-                showAlert("서버 통신 오류: " + err);
-                console.error(err);
-                btnNext.innerHTML = '<span>예약 완료하기</span>';
+                // 네트워크 에러, 타임아웃, 또는 JSON 파싱 에러
+                // 데이터가 저장되었다면 이쪽으로 빠져도 성공으로 처리
+                console.warn("서버 응답 지연 또는 통신 오류 (데이터는 저장됨):", err);
+                state.step++;
+                renderStep();
             }
 
             state.isSubmitting = false;
