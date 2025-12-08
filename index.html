@@ -652,6 +652,8 @@
         // --- Helpers ---
         window.selectMethod = (id) => { state.data.learningMethod = id; if (id === 'none') { state.data.moveReasons = []; state.data.moveReasonOther = ''; } renderHistory(); };
         window.toggleReason = (id) => { const index = state.data.moveReasons.indexOf(id); if (index === -1) state.data.moveReasons.push(id); else state.data.moveReasons.splice(index, 1); renderHistory(); };
+        window.selectDisposition = (id, val) => { state.data.disposition[id] = val; renderDisposition(); };
+        function getLearningMethodLabel(id) { const m = learningMethods.find(x => x.id === id); return m ? m.label : '미선택'; }
 
         // Expose functions to window
         window.setConsultPath = setConsultPath;
